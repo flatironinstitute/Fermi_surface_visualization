@@ -1,0 +1,114 @@
+"""
+Construct JSON from raw data in HDF5 files.
+"""
+
+import os
+import json
+import h5py
+import numpy as np
+from numpy.linalg import norm
+
+RAW_FOLDER = "../raw_data"
+JSON_FOLDER = "../docs/json"
+
+def jsoniffy(filename):
+    [prefix, ext] = filename.split(".")
+    assert ext == "h5"
+    src_path = os.path.join(RAW_FOLDER, filename)
+    dst_path = os.path.join(JSON_FOLDER, prefix + ".json")
+    print("Converting", repr(src_path), "to json in", repr(dst_path))
+    f = h5py.File(src_path, 'r')
+    E_full = np.array(f["E_full"], dtype=np.float)
+    V_full = np.array(f["V_full"], dtype=np.float)
+    (num_layers, num_rows, num_cols, two) = E_full.shape
+    assert two >= 2 # allow too many channels
+    (nl, nr, nc, two, three) = V_full.shape
+    assert (nl, nr, nc) == (num_layers, num_rows, num_cols)
+    assert two >= 2
+    assert three == 3
+    min_value = E_full.min()
+    max_value = E_full.max()
+    out = open(dst_path, "w")
+    w = out.write
+    w("{\n")
+    w('"num_layers": %s,\n' % num_layers)
+    w('"num_rows": %s,\n' % num_rows)
+    w('"num_columns": %s,\n' % num_cols)
+    w('"min_value": %s,\n' % min_value)
+    w('"max_value": %s,\n' % max_value)
+    E0 = level_json(E_full, V_full, 0)
+    w('"E0": %s,\n' % E0)
+    E1 = level_json(E_full, V_full, 1)
+    w('"E1": %s\n' % E1)
+    w("}\n")
+    out.close()
+    return dst_path
+
+def level_json(E_full, V_full, level):
+    (nl, nr, nc, two, three) = V_full.shape
+    (nl, nr, nc, two) = E_full.shape
+    E = E_full[:,:,:,level].reshape((nl, nr, nc))
+    V = V_full[:,:,:,level,:].reshape((nl, nr, nc, 3))
+    C = colors_from_velocities(V)
+    L = []
+    a = L.append
+    a("{\n")
+    a('"values": %s,' % ravelled_json(E))
+    a('"colors": %s' % ravelled_json(C))
+    a("}")
+    return "".join(L)
+
+def colors_from_velocities(velocities):
+    assert velocities.shape[-1] == 3
+    vr = velocities.ravel()
+    (lvr,)  = vr.shape
+    velocities2d = vr.reshape((lvr//3, 3))
+    norms = norm(velocities2d, axis=1)
+    max_norm = norms.max()
+    colors2d = np.abs(velocities2d/max_norm)
+    colors = colors2d.reshape(velocities.shape)
+    return colors
+
+def float_fmt(x):
+    return "%3.2e" % x
+
+def array_content(array):
+    "Dump ravelled array content as string."
+    s = array.shape
+    ls = len(s)
+    L = []
+    a = L.append
+    inside = False
+    if len(s) == 1:
+        for x in array:
+            if inside:
+                a(",")
+            a(float_fmt(x))
+            inside = True
+    else:
+        assert len(s)>1
+        for ar in array:
+            if inside:
+                a(",\n")
+            a(array_content(ar))
+            inside = True
+    return "".join(L)
+
+def ravelled_json(array):
+    return "[\n" + array_content(array) + "\n]"
+
+def test():
+    a = np.arange(2*3*5).reshape((2,3,5)) * 0.5
+    j = ravelled_json(a)
+    a2 = np.array(json.loads(j)).reshape(a.shape)
+    assert(a.tolist() == a2.tolist())
+    velocities = np.arange(3*4*5*2*3).reshape((3,4,5,2,3))
+    colors = colors_from_velocities(velocities)
+    assert colors.shape == velocities.shape
+    json_path = jsoniffy("Fake.h5")
+    f = open(json_path)
+    D = json.load(f)
+
+if __name__ == "__main__":
+    test()
+    
