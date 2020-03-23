@@ -16,28 +16,38 @@
 
     <div class="fermi_grid">
       <div class="fermi_slider">
-        slider
+        <div class="fermi_slider_readout" id="value_readout">readout</div>
+        <div class="fermi_slider_slider" id="value_slider">value_slider</div>
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="normals_0">
         normals 0
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="normals_1">
         normals 1
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="normals_both">
         normals both
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="velocity_0">
         velocity 0
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="velocity_1">
         velocity 1
       </div>
-      <div class="grid9_item">
+      <div class="grid9_item" id="velocity_both">
         velocity both
       </div>
       <div class="fermi_controls">
-        controls and info
+        <h4>Interactive Controls</h4>
+        <div class="dim_slider" id="col_slider"></div>
+        <div class="dim_slider"  id="row_slider"></div>
+        <div class="dim_slider"  id="layer_slider"></div>
+        <p>
+          Rotate all figures by dragging the mouse over the central wireframe.
+        </p>
+        <p>
+          Adjust the top slider to change the energy cutoff value.
+        </p>
       </div>
       <div class="grid9_item">
         wire frame rotator
@@ -56,6 +66,11 @@
     <script src="./js/feedbackSurfaces.js"></script>
     <script src="./js/canvas_2d_widget_helper.js"></script>
     <script src="./js/dual_canvas_helper.js"></script>
+    <script src="./main.js"></script>
+
+    <script>
+      load_file("json/Fake.json")
+    </script>
 
   </body>
 </html>
