@@ -65,20 +65,21 @@ h4 {
 .fermi_grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 30px repeat(3, 30%);
+  grid-template-rows: 30px 80vmin 30px;
   grid-column-gap: 5px;
   grid-row-gap: 5px;
   margin-top: 5px;
   margin-bottom: 5px;
   margin-left: 5px;
   margin-right: 5px;
-  width:98vmin;
+  width:98hmax;
   height:98vmin;
 }
 
 .dim_slider {
   display: grid;
   grid-template-columns: 90px auto;
+  background-color: #dde;
 }
 
 .fermi_slider {
