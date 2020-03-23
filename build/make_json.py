@@ -20,33 +20,38 @@ def jsoniffy(filename):
     f = h5py.File(src_path, 'r')
     E_full = np.array(f["E_full"], dtype=np.float)
     V_full = np.array(f["V_full"], dtype=np.float)
-    (num_layers, num_rows, num_cols, two) = E_full.shape
-    assert two >= 2 # allow too many channels
-    (nl, nr, nc, two, three) = V_full.shape
-    assert (nl, nr, nc) == (num_layers, num_rows, num_cols)
-    assert two >= 2
+    (num_layers, num_rows, num_cols, num_levels) = E_full.shape
+    assert num_levels >= 2
+    (nl, nr, nc, nlv, three) = V_full.shape
+    assert (nl, nr, nc, nlv) == (num_layers, num_rows, num_cols, num_levels)
     assert three == 3
     min_value = E_full.min()
     max_value = E_full.max()
     out = open(dst_path, "w")
     w = out.write
     w("{\n")
+    w('"num_levels": %s,\n' % num_levels)
     w('"num_layers": %s,\n' % num_layers)
     w('"num_rows": %s,\n' % num_rows)
     w('"num_columns": %s,\n' % num_cols)
     w('"min_value": %s,\n' % min_value)
     w('"max_value": %s,\n' % max_value)
-    E0 = level_json(E_full, V_full, 0)
-    w('"E0": %s,\n' % E0)
-    E1 = level_json(E_full, V_full, 1)
-    w('"E1": %s\n' % E1)
+    inside = False
+    for level in range(num_levels):
+        if inside:
+            w(",\n")
+        else:
+            w("\n")
+        Elevel = level_json(E_full, V_full, level)
+        w('"E%s": %s' % (level, Elevel))
+        inside = True
     w("}\n")
     out.close()
     return dst_path
 
 def level_json(E_full, V_full, level):
-    (nl, nr, nc, two, three) = V_full.shape
-    (nl, nr, nc, two) = E_full.shape
+    (nl, nr, nc, nlv, three) = V_full.shape
+    (nl, nr, nc, nlv) = E_full.shape
     E = E_full[:,:,:,level].reshape((nl, nr, nc))
     V = V_full[:,:,:,level,:].reshape((nl, nr, nc, 3))
     C = colors_from_velocities(V)
