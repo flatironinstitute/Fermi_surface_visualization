@@ -11,6 +11,11 @@ from numpy.linalg import norm
 RAW_FOLDER = "../raw_data"
 JSON_FOLDER = "../docs/json"
 
+def jsoniffy_all():
+    filenames = os.listdir(RAW_FOLDER)
+    for filename in filenames:
+        jsoniffy(filename)
+
 def jsoniffy(filename):
     [prefix, ext] = filename.split(".")
     assert ext == "h5"
@@ -115,5 +120,7 @@ def test():
     D = json.load(f)
 
 if __name__ == "__main__":
-    test()
+    #test()
+    jsoniffy_all()
+
     
