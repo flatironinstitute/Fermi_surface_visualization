@@ -327,6 +327,7 @@ Structure follows: https://learn.jquery.com/plugins/basic-plugin-creation/
                 const N_TRIANGLES = 2;  
                 const N_VERTICES = 3;
                 var vertices_per_instance = N_TETRAHEDRA * N_TRIANGLES * N_VERTICES;
+                this.vertices_per_instance = vertices_per_instance;
                 // add vertex count bogus input for Firefox
                 var vertexNumArray = new Float32Array(Array.from(Array(vertices_per_instance).keys()));
                 this.vertex_num_buffer = this.feedbackContext.buffer()
@@ -811,12 +812,37 @@ Structure follows: https://learn.jquery.com/plugins/basic-plugin-creation/
                         compacted.back_corners
                     );
                 }
+                this.indices = compacted.indices;
+                this.vertices_per_instance = this.segments.vertices_per_instance;
                 this.segments.run();
                 var after_run_callback = this.settings.after_run_callback;
                 if (after_run_callback) {
                     after_run_callback(this);
                 }
                 //var positions = segments.get_positions();
+            };
+            colorization(voxel_color_source, vertex_color_destination) {
+                // apply voxel colors to vertices for active voxel indices
+                var indices = this.indices;
+                var vertices_per_instance = this.vertices_per_instance;
+                var skip_index = vertices_per_instance * 3;
+                var num_indices = indices.length;
+                var count = 0;
+                for (var i=0; i<num_indices; i++){
+                    var index = indices[i];
+                    if (index < 0) {
+                        count += skip_index;
+                    } else {
+                        var cindex = 3 * index;
+                        for (var vn=0; vn<vertices_per_instance; vn++) {
+                            for (var cn=0; cn<3; cn++) {
+                                vertex_color_destination[count] = voxel_color_source[cindex + cn];
+                                count ++;
+                            }
+                        }
+                    }
+                }
+                return vertex_color_destination;
             };
             linked_three_geometry (THREE) {
                 // create a three.js geometry linked to the current positions feedback array.

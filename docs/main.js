@@ -118,6 +118,7 @@ class EnergyLevelController {
         this.vertices = surfaces.get_positions(this.vertices);
         this.normals = surfaces.get_normals(this.normals);
         if (!this.wire_colors) {
+            // initialize colors arrays
             var ln = this.vertices.length;
             var w = new Float32Array(ln);
             var c = this.wire_color;
@@ -125,9 +126,11 @@ class EnergyLevelController {
                 w[i] = c[i % 3];
             }
             this.wire_colors = w;
+            this.velocity_colors = new Float32Array(ln);
         }
         // XXXXX TEMPORARY DEBUG VALUE FOR VELOCITY_COLORS
-        this.velocity_colors = this.wire_colors;
+        //this.velocity_colors = this.wire_colors;
+        this.velocity_colors = surfaces.colorization(this.colors, this.velocity_colors);
     };
 };
 
