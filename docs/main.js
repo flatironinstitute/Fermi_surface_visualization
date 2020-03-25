@@ -2,6 +2,8 @@
 // globals for easy debugging
 var json_data, name_to_controller, wire_frame;
 var normals, velocities, collector;
+var config;
+const CONFIG_FILE = "./config.json"
 
 class BufferCollector {
     constructor(level_controllers, runner) {
@@ -93,6 +95,10 @@ class EnergyLevelController {
         this.container = $("<div/>");
         this.context = this.container.feedWebGL2({});
         var middle = 0.5 * (json_data.min_value + json_data.max_value);
+        var shrink_factor = 0.5;
+        if (valuesArray.length > 10000) {
+            shrink_factor = 0.2;
+        }
         var surface_options = {
             feedbackContext: this.context,
             valuesArray: valuesArray,
@@ -101,7 +107,7 @@ class EnergyLevelController {
             num_layers: json_data.num_layers,
             rasterize: false,
             threshold: middle,
-            shrink_factor: 0.4,
+            shrink_factor: shrink_factor,
         }
         this.surfaces = this.container.webGL2surfaces3dopt(surface_options);
         this.wire_colors = null;
@@ -290,9 +296,43 @@ set_up_dim_slider = function(container, dim, index) {
     return slider;
 };
 
-var load_file = function(json_file_url) {
+var load_file = function(config) {
+    // load the first prefix unless specified at end of query string
+    var prefixes = config.prefixes;
+    var chosen_prefix = prefixes[0];
+    var url = location.toString();
+    var main_url = url.split("?")[0];
+    for (var i=0; i<prefixes.length; i++) {
+        prefix = prefixes[i];
+        if (url.endsWith(prefix)) {
+            chosen_prefix = prefix;
+        }
+    }
+    var selection_span = $("#dataset_selection");
+    var selection = $("<select/>").appendTo(selection_span);
+    debugger;
+    for (var i=0; i<prefixes.length; i++) {
+        prefix = prefixes[i];
+        var option = $("<option/>");
+        option.attr("value", prefix);
+        option.text(prefix);
+        if (prefix == chosen_prefix) {
+            option.attr("selected", "selected");
+        }
+        selection.append(option);
+    }
+    var select_change = function() {
+        var val = selection.val();
+        document.location.href = main_url + "?q=" + val;
+    };
+    selection.change(select_change)
+    var json_file_url = "./json/" + chosen_prefix + ".json";
     $.getJSON(json_file_url, set_up).fail(on_load_failure);
 };
+
+var load_config = function() {
+    $.getJSON(CONFIG_FILE, load_file).fail(on_load_failure);
+}
 
 var on_load_failure = function() {
     alert("Could not load local JSON data.\n" +
