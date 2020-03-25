@@ -10,11 +10,23 @@ from numpy.linalg import norm
 
 RAW_FOLDER = "../raw_data"
 JSON_FOLDER = "../docs/json"
+CONFIG_PATH = "../docs/config.json"
 
 def jsoniffy_all():
+    # remove existing json files
+    oldjsons = os.listdir(JSON_FOLDER)
+    for oldjson in oldjsons:
+        if oldjson.endswith(".json"):
+            oldpath = os.path.join(JSON_FOLDER, oldjson)
+            print ("removing", oldpath)
+            os.unlink(oldpath)
     filenames = os.listdir(RAW_FOLDER)
-    for filename in filenames:
-        jsoniffy(filename)
+    prefixes = [jsoniffy(filename) for filename in filenames if filename.endswith(".h5")]
+    D = {"prefixes": prefixes}
+    f = open(CONFIG_PATH, "w")
+    json.dump(D, f)
+    f.close()
+    print("wrote configuration", repr(CONFIG_PATH))
 
 def jsoniffy(filename):
     [prefix, ext] = filename.split(".")
@@ -52,10 +64,11 @@ def jsoniffy(filename):
         inside = True
     w("}\n")
     out.close()
-    return dst_path
+    return prefix
 
 def level_json(E_full, V_full, level):
     (nl, nr, nc, nlv, three) = V_full.shape
+    assert three == 3
     (nl, nr, nc, nlv) = E_full.shape
     E = E_full[:,:,:,level].reshape((nl, nr, nc))
     V = V_full[:,:,:,level,:].reshape((nl, nr, nc, 3))
