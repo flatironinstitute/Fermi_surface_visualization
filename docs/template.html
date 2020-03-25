@@ -22,7 +22,14 @@
     
     </p>
     <p>
-      The surfaces displayed approximates where the electron energy or velocity reaches an adjustable cut off value.
+      The surfaces displayed approximates iso-surfaces where the electron energy or velocity reaches an adjustable cut off value.
+      <dl>
+        <li>The left panel displays iso-surfaces colorized by the direction of the surface normal at each vertex.</li>
+        <li>The middle panel displays iso-surfaces colorized by electron velocity vector at each vertex.</li>
+        <li>The right panel displays wireframes for the iso-surfaces where the different colors
+          represent different quanta (??? What do the different indices represent????)
+        </li>
+      </dl>
     </p>
    <p>
      Rotate all figures by dragging the mouse over the wireframe on the right.
@@ -34,6 +41,12 @@
    <p>
     Adjust the bottom sliders to slice away parts of the surface.
   </p>
+
+  <div>
+    Change the selected data set here: <span id="dataset_selection"></span>
+    -- datasets ending "Nk30" have half the resolution and 8 times the speed
+    compared to datasets ending "Nk60".
+  </div>
 
     <div class="fermi_grid">
       <div class="fermi_slider">
@@ -54,10 +67,6 @@
       <div class="dim_slider"  id="layer_slider">layer_slider</div> 
     </div>
 
-    <div class="container__footer">
-      <a href="./index.html">Return to documentation index.</a>
-    </div>
-
     <script src="./js/three.min.js"></script>
     <script src="./js/OrbitControls.js"></script>
     <script src="./js/jquery.min.js"></script>
@@ -69,7 +78,8 @@
     <script src="./main.js"></script>
 
     <script>
-      load_file("json/Fake.json")
+      //load_file("json/Fake.json")
+      load_config();
     </script>
 
   </body>

@@ -22,7 +22,7 @@ def jsoniffy_all():
             os.unlink(oldpath)
     filenames = os.listdir(RAW_FOLDER)
     prefixes = [jsoniffy(filename) for filename in filenames if filename.endswith(".h5")]
-    D = {"prefixes": prefixes}
+    D = {"prefixes": sorted(prefixes)}
     f = open(CONFIG_PATH, "w")
     json.dump(D, f)
     f.close()
