@@ -98,7 +98,7 @@ class EnergyLevelController {
         if ((json_data.min_value < 0) && (json_data.max_value >0)) {
             middle = 0.0;
         }
-        var shrink_factor = 0.5;
+        var shrink_factor = 0.6;
         if (valuesArray.length > 10000) {
             shrink_factor = 0.2;
         }
@@ -161,11 +161,17 @@ class NormalsController {
         this.scene = new THREE.Scene();
         this.scene.add( new THREE.AmbientLight( 0x444444 ) );
         this.camera = new THREE.PerspectiveCamera( 45, this.$container.width()/this.$container.height(), 1, 10000 );
-        this.camera.position.set( 0, 0, 4 );
+        // look from the negative y axis
+        //this.camera.position.set( 0, -5, 0 );  // messes up orbit controller
+        this.camera.position.set(0, 0, 4);
+        // z positive is "up"
+        //this.camera.up.set(0, 0, 1); // messes up orbit controller
         this.geometry = this.get_geometry();
         this.material = this.get_material();
         this.material.side = THREE.DoubleSide;
         this.mesh = new THREE.Mesh( this.geometry,  this.material );
+        // rotate so Z points up
+        this.mesh.rotation.x = - Math.PI / 2;
         this.scene.add( this.mesh );
         this.renderer.render( this.scene, this.camera );
     };
@@ -207,6 +213,7 @@ class WireFrameController extends NormalsController {
     orbit(normals, velocities) {
         var that = this;
         this.orbitControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitControls.update();
         this.orbitControls.userZoom = false;
         this.clock = new THREE.Clock();
 
@@ -254,9 +261,9 @@ var set_up = function(data) {
     update_value();
     json_data.grid_mins = [0, 0, 0];
     json_data.grid_maxes = [json_data.num_columns, json_data.num_rows, json_data.num_layers];
-    var col_slider = set_up_dim_slider("col_slider", json_data.num_columns, 0);
-    var row_slider = set_up_dim_slider("row_slider", json_data.num_rows, 1);
-    var layer_slider = set_up_dim_slider("layer_slider", json_data.num_layers, 2);
+    var col_slider = set_up_dim_slider("X_slider", json_data.num_columns, 0);
+    var row_slider = set_up_dim_slider("Y_slider", json_data.num_rows, 1);
+    var layer_slider = set_up_dim_slider("Z_slider", json_data.num_layers, 2);
     // set up the level controllers
     var level_controllers = {};
     for (var level=0; level<json_data.num_levels; level++) {
