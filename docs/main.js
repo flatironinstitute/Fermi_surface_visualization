@@ -98,7 +98,7 @@ class EnergyLevelController {
         if ((json_data.min_value < 0) && (json_data.max_value >0)) {
             middle = 0.0;
         }
-        var shrink_factor = 0.6;
+        var shrink_factor = 0.7;
         if (valuesArray.length > 10000) {
             shrink_factor = 0.2;
         }
@@ -159,11 +159,18 @@ class NormalsController {
         this.container.appendChild( this.renderer.domElement );
 
         this.scene = new THREE.Scene();
-        this.scene.add( new THREE.AmbientLight( 0x444444 ) );
+        //this.scene.add( new THREE.AmbientLight( 0x444444 ) );
+        var axesHelper = new THREE.AxesHelper( 15 );
+        axesHelper.rotation.x = - Math.PI / 2;
+        var offset = -1.02;
+        axesHelper.translateX(offset);
+        axesHelper.translateY(offset);
+        axesHelper.translateZ(offset);
+        this.scene.add( axesHelper )
         this.camera = new THREE.PerspectiveCamera( 45, this.$container.width()/this.$container.height(), 1, 10000 );
         // look from the negative y axis
         //this.camera.position.set( 0, -5, 0 );  // messes up orbit controller
-        this.camera.position.set(0, 0, 4);
+        this.camera.position.set(0, 0, 5);
         // z positive is "up"
         //this.camera.up.set(0, 0, 1); // messes up orbit controller
         this.geometry = this.get_geometry();
