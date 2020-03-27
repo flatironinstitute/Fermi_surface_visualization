@@ -137,8 +137,35 @@ ccolors = [
     (ary(0,0,-1), ary(.7,.7,0)),
 ]
 
+verbose = False
+
 def cubic_colors(velocities):
-    return tetrahedral_colors(velocities, ccolors)
+    vcolors = ccolors
+    assert velocities.shape[-1] == 3
+    vr = velocities.ravel()
+    (lvr,)  = vr.shape
+    velocities2d = vr.reshape((lvr//3, 3))
+    norms = norm(velocities2d, axis=1)
+    max_norm = norms.max()
+    nvelocities = velocities2d/max_norm
+    colors = nvelocities[:]
+    for (i, nv) in enumerate(nvelocities):
+        nm = norm(nv)
+        c = nv * 0.0
+        for (vertex, color) in vcolors:
+            d = vertex.dot(nv)
+            if d > 0:
+                c += d * color
+        c[c < 0] = 0  # null out negatives
+        cn = norm(c)
+        if cn < 0.001:
+            cn = 1.0  # hack
+            nm = 0
+        color = (nm/cn) * c
+        if verbose:
+            print(nv, "colorized", color)
+        colors[i] = color
+    return colors
 
 #colorizer = tetrahedral_colors
 colorizer = cubic_colors
@@ -172,6 +199,8 @@ def ravelled_json(array):
     return "[\n" + array_content(array) + "\n]"
 
 def test():
+    global verbose
+    verbose = True
     a = np.arange(2*3*5).reshape((2,3,5)) * 0.5
     j = ravelled_json(a)
     a2 = np.array(json.loads(j)).reshape(a.shape)
@@ -183,6 +212,7 @@ def test():
     json_path = os.path.join(JSON_FOLDER, prefix+".json")
     f = open(json_path)
     D = json.load(f)
+    verbose = False
 
 if __name__ == "__main__":
     #test()
