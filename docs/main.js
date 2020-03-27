@@ -160,13 +160,6 @@ class NormalsController {
 
         this.scene = new THREE.Scene();
         //this.scene.add( new THREE.AmbientLight( 0x444444 ) );
-        var axesHelper = new THREE.AxesHelper( 15 );
-        axesHelper.rotation.x = - Math.PI / 2;
-        var offset = -1.02;
-        axesHelper.translateX(offset);
-        axesHelper.translateY(offset);
-        axesHelper.translateZ(offset);
-        this.scene.add( axesHelper )
         this.camera = new THREE.PerspectiveCamera( 45, this.$container.width()/this.$container.height(), 1, 10000 );
         // look from the negative y axis
         //this.camera.position.set( 0, -5, 0 );  // messes up orbit controller
@@ -180,7 +173,11 @@ class NormalsController {
         // rotate so Z points up
         this.mesh.rotation.x = - Math.PI / 2;
         this.scene.add( this.mesh );
+        this.annotate();
         this.renderer.render( this.scene, this.camera );
+    };
+    annotate() {
+        // default: nothing.
     };
     get_geometry() {
         return this.collector.normal_geometry;
@@ -209,6 +206,19 @@ class VelocityController extends NormalsController {
 };
 
 class WireFrameController extends NormalsController {
+    annotate() {
+        //THREE.sprite_text(this.scene, "O", [[-1,-1,1]], .5, "white", 20);
+        THREE.sprite_text(this.scene, "X", [[1.1,-1.1,1.1]], .5, "red", 20);
+        THREE.sprite_text(this.scene, "Y", [[-1.1,-1.1,-1.1]], .5, "green", 20);
+        THREE.sprite_text(this.scene, "Z", [[-1.1,1.1,1.1]], .5, "blue", 20);
+        var axesHelper = new THREE.AxesHelper( 15 );
+        axesHelper.rotation.x = - Math.PI / 2;
+        var offset = -1.02;
+        axesHelper.translateX(offset);
+        axesHelper.translateY(offset);
+        axesHelper.translateZ(offset);
+        this.scene.add( axesHelper )
+    };
     get_geometry() {
         return this.collector.wireframe_geometry;
     };
