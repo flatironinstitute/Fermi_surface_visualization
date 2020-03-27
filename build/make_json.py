@@ -72,7 +72,7 @@ def level_json(E_full, V_full, level):
     (nl, nr, nc, nlv) = E_full.shape
     E = E_full[:,:,:,level].reshape((nl, nr, nc))
     V = V_full[:,:,:,level,:].reshape((nl, nr, nc, 3))
-    C = colors_from_velocities(V)
+    C = colorizer(V)
     L = []
     a = L.append
     a("{\n")
@@ -91,6 +91,41 @@ def colors_from_velocities(velocities):
     colors2d = np.abs(velocities2d/max_norm)
     colors = colors2d.reshape(velocities.shape)
     return colors
+
+def ary(*vals):
+    return np.array(vals, dtype=np.float)
+
+vcolors = [
+    # vertex, color for tetrahedron
+    (ary(-1,-1,-1), ary(0.7,0.7,0.7)),
+    (ary(1,1,-1), ary(1,1,0)),
+    (ary(1,-1,1), ary(1,0,1)),
+    (ary(-1,1,1), ary(0,1,1)),
+]
+
+def tetrahedral_colors(velocities):
+    assert velocities.shape[-1] == 3
+    vr = velocities.ravel()
+    (lvr,)  = vr.shape
+    velocities2d = vr.reshape((lvr//3, 3))
+    norms = norm(velocities2d, axis=1)
+    max_norm = norms.max()
+    nvelocities = velocities2d/max_norm
+    colors = nvelocities[:]
+    for (i, nv) in enumerate(nvelocities):
+        nm = norm(nv)
+        c = 0
+        for (vertex, color) in vcolors:
+            c += (vertex.dot(nv)) * color
+        c[c < 0] = 0  # null out negatives
+        cn = norm(c)
+        if cn < 0.001:
+            cn = 1.0  # hack
+            nm = 0
+        colors[i] = (nm/cn) * c
+    return colors
+
+colorizer = tetrahedral_colors
 
 def float_fmt(x):
     return "%3.2e" % x
@@ -128,7 +163,8 @@ def test():
     velocities = np.arange(3*4*5*2*3).reshape((3,4,5,2,3))
     colors = colors_from_velocities(velocities)
     assert colors.shape == velocities.shape
-    json_path = jsoniffy("Fake.h5")
+    prefix = jsoniffy("XXX_Fakedata.h5")
+    json_path = os.path.join(JSON_FOLDER, prefix+".json")
     f = open(json_path)
     D = json.load(f)
 
