@@ -95,6 +95,9 @@ class EnergyLevelController {
         this.container = $("<div/>");
         this.context = this.container.feedWebGL2({});
         var middle = 0.5 * (json_data.min_value + json_data.max_value);
+        if ((json_data.min_value < 0) && (json_data.max_value >0)) {
+            middle = 0.0;
+        }
         var shrink_factor = 0.5;
         if (valuesArray.length > 10000) {
             shrink_factor = 0.2;
@@ -236,11 +239,15 @@ var set_up = function(data) {
         }
     };
     value_slider.empty();
+    var value = 0.5 * (M + m);
+    if ((M>0) && (m<0)) {
+        value = 0.0;
+    }
     value_slider.slider({
         min: m,
         max: M,
         step: 0.01 * (M - m),
-        value: 0.5 * (M + m),
+        value: 0.0,
         slide: update_value,
         change: update_value,
     });
