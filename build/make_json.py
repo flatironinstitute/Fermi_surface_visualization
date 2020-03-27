@@ -95,6 +95,7 @@ def colors_from_velocities(velocities):
 def ary(*vals):
     return np.array(vals, dtype=np.float)
 
+# tetrahedral colors
 vcolors = [
     # vertex, color for tetrahedron
     (ary(-1,-1,-1), ary(0.7,0.7,0.7)),
@@ -103,7 +104,7 @@ vcolors = [
     (ary(-1,1,1), ary(0,1,1)),
 ]
 
-def tetrahedral_colors(velocities):
+def tetrahedral_colors(velocities, vcolors=vcolors):
     assert velocities.shape[-1] == 3
     vr = velocities.ravel()
     (lvr,)  = vr.shape
@@ -125,7 +126,22 @@ def tetrahedral_colors(velocities):
         colors[i] = (nm/cn) * c
     return colors
 
-colorizer = tetrahedral_colors
+# cubic colors
+ccolors = [
+    # vertex, color for cube
+    (ary(1,0,0), ary(1,0,0)),
+    (ary(0,1,0), ary(0,1,0)),
+    (ary(0,0,1), ary(0,0,1)),
+    (ary(-1,0,0), ary(0,.7,.7)),
+    (ary(0,-1,0), ary(.7,0,.7)),
+    (ary(0,0,-1), ary(.7,.7,0)),
+]
+
+def cubic_colors(velocities):
+    return tetrahedral_colors(velocities, ccolors)
+
+#colorizer = tetrahedral_colors
+colorizer = cubic_colors
 
 def float_fmt(x):
     return "%3.2e" % x
