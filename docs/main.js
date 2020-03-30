@@ -98,8 +98,8 @@ class EnergyLevelController {
         if ((json_data.min_value < 0) && (json_data.max_value >0)) {
             middle = 0.0;
         }
-        var shrink_factor = 0.7;
-        if (valuesArray.length > 10000) {
+        var shrink_factor = 0.5;
+        if (valuesArray.length > 30000) {
             shrink_factor = 0.2;
         }
         var surface_options = {
