@@ -65,7 +65,7 @@ h4 {
 .fermi_grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 30px 80vmin 30px;
+  grid-template-rows: 30px 80vmin 30px 20px;
   grid-column-gap: 5px;
   grid-row-gap: 5px;
   margin-top: 5px;
@@ -80,6 +80,13 @@ h4 {
   display: grid;
   grid-template-columns: 90px auto;
   background-color: #979;
+}
+
+.gradient_div {
+  grid-column: 1/4;
+  display: grid;
+  background-image: linear-gradient(to right, rgb(0,255,255), rgb(255,0,0));
+  grid-template-columns: auto auto;
 }
 
 .fermi_slider {

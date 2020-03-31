@@ -42,6 +42,14 @@ def jsoniffy(filename):
     (nl, nr, nc, nlv, three) = V_full.shape
     assert (nl, nr, nc, nlv) == (num_layers, num_rows, num_cols, num_levels)
     assert three == 3
+    # compute max and min intensities for all of V_full
+    vr = V_full.ravel()
+    (lvr,) = vr.shape
+    v2d = vr.reshape((lvr//3, 3))
+    vxy = v2d[:, :2]
+    norms_squared = norm(vxy, axis=1)# ** 2
+    max_intensity = norms_squared.max()
+    min_intensity = norms_squared.min()
     min_value = E_full.min()
     max_value = E_full.max()
     out = open(dst_path, "w")
@@ -53,26 +61,30 @@ def jsoniffy(filename):
     w('"num_columns": %s,\n' % num_cols)
     w('"min_value": %s,\n' % min_value)
     w('"max_value": %s,\n' % max_value)
+    w('"min_intensity": %s,\n' % min_intensity)
+    w('"max_intensity": %s,\n' % max_intensity)
     inside = False
     for level in range(num_levels):
         if inside:
             w(",\n")
         else:
             w("\n")
-        Elevel = level_json(E_full, V_full, level)
+        Elevel = level_json(E_full, V_full, level, min_intensity, max_intensity)
         w('"E%s": %s' % (level, Elevel))
         inside = True
     w("}\n")
     out.close()
     return prefix
 
-def level_json(E_full, V_full, level):
+def level_json(E_full, V_full, level, min_intensity, max_intensity):
     (nl, nr, nc, nlv, three) = V_full.shape
     assert three == 3
     (nl, nr, nc, nlv) = E_full.shape
     E = E_full[:,:,:,level].reshape((nl, nr, nc))
     V = V_full[:,:,:,level,:].reshape((nl, nr, nc, 3))
-    C = colorizer(V)
+    #C = colorizer(V)
+    xy_colors = xy_colorize(V, min_intensity, max_intensity)
+    C = xy_colors["colors"]
     L = []
     a = L.append
     a("{\n")
@@ -169,6 +181,33 @@ def cubic_colors(velocities):
 
 #colorizer = tetrahedral_colors
 colorizer = cubic_colors
+
+def xy_colorize(velocities, max_intensity, min_intensity):
+    max_color = ary(1.0, 0, 0)
+    min_color = ary(0.0, 1.0, 1.0)
+    #max_intensity = min_intensity = None
+    assert velocities.shape[-1] == 3
+    vr = velocities.ravel()
+    (lvr,)  = vr.shape
+    velocities2d = vr.reshape((lvr//3, 3))
+    vxy = velocities2d[:, :2]
+    norms_squared = norm(vxy, axis=1)# ** 2
+    #max_intensity = norms_squared.max()
+    #min_intensity = norms_squared.min()
+    colors = velocities2d[:]
+    diff = max_intensity - min_intensity
+    for (i, ns) in enumerate(norms_squared):
+        lmbda = (ns - min_intensity) / diff
+        colors[i,:] = (1 - lmbda) * min_color + lmbda * max_color
+        if ns == min_intensity or ns == max_intensity:
+            print (ns, "extreme color", colors[i])
+    return {
+        "max_color": list(max_color),
+        "min_color": list(min_color),
+        "max_intensity": max_intensity,
+        "min_intensity": min_intensity,
+        "colors": colors,
+    }
 
 def float_fmt(x):
     return "%3.2e" % x

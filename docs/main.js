@@ -249,6 +249,11 @@ class WireFrameController extends NormalsController {
 
 var set_up = function(data) {
     json_data = data;  // store in global
+    // report velocity min/max
+    var vmax_div = $("#velocity_max");
+    var vmin_div = $("#velocity_min");
+    vmax_div.html("velocity max: " + json_data.max_intensity.toFixed(6));
+    vmin_div.html("velocity min: " + json_data.min_intensity.toFixed(6));
     // set up the sliders
     var value_slider = $("#value_slider");
     var value_readout = $("#value_readout")
