@@ -278,9 +278,9 @@ var set_up = function(data) {
     update_value();
     json_data.grid_mins = [0, 0, 0];
     json_data.grid_maxes = [json_data.num_columns, json_data.num_rows, json_data.num_layers];
-    var col_slider = set_up_dim_slider("X_slider", json_data.num_columns, 0);
+    var col_slider = set_up_dim_slider("X_slider", json_data.num_layers, 2);
     var row_slider = set_up_dim_slider("Y_slider", json_data.num_rows, 1);
-    var layer_slider = set_up_dim_slider("Z_slider", json_data.num_layers, 2);
+    var layer_slider = set_up_dim_slider("Z_slider", json_data.num_columns, 0);
     // set up the level controllers
     var level_controllers = {};
     for (var level=0; level<json_data.num_levels; level++) {
