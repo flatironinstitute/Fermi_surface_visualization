@@ -55,9 +55,12 @@ Structure follows: https://learn.jquery.com/plugins/basic-plugin-creation/
                 });
 
                 // set up input parameters
-                var x_offset = 1;
+                //  indexing is [ix, iy, iz] -- z is fastest
+                //var x_offset = 1;
+                var z_offset = 1;
                 var y_offset = s.num_cols;
-                var z_offset = s.num_cols * s.num_rows;
+                //var z_offset = s.num_cols * s.num_rows;
+                var x_offset = s.num_cols * s.num_rows;
                 var num_voxels = nvalues - (x_offset + y_offset + z_offset);
 
                 var inputs = {};
