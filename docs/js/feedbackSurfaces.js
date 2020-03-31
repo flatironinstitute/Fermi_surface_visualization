@@ -600,7 +600,8 @@ Structure follows: https://learn.jquery.com/plugins/basic-plugin-creation/
                     // check denominator is not too small? xxxx
                     float delta = (wtL - uValue) / (wtL - wtR);
                     vec3 combined_offset = ((1.0 - delta) * offsetL) + (delta * offsetR);
-                    vec3 vertex = combined_offset + vec3(col_num, row_num, layer_num);
+                    //vec3 vertex = combined_offset + vec3(col_num, row_num, layer_num);
+                    vec3 vertex = combined_offset + vec3(layer_num, row_num, col_num);
                     vPosition = dx * vertex[0] + dy * vertex[1] + dz * vertex[2] + translation;
                     gl_Position.xyz = vPosition;
                     gl_Position[3] = 1.0;
