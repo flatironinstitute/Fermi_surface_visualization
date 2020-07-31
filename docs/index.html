@@ -17,17 +17,22 @@
 
     <h4>Fermi Energy Iso-surfaces</h4>
     <p>
-    This interactive visualization explores theoretical electron energy
-    levels and velocities in a crystal lattice.  The implementation runs in web pages and uses WebGL2 features which are not supported on all browser configurations.
+        This interactive visualization explores theoretical electron energy levels and velocities of a crystalline material.
+        The implementation runs in web pages and uses WebGL2 features which are not supported on all browser configurations.
     
     </p>
     <p>
-      The surfaces displayed approximates iso-surfaces where the electron energy or velocity reaches an adjustable cut off value.
-      <dl>
+        The panels display the energy iso-surface in reciprocal momentum space where the electron energy reaches an 
+        adjustable energy cut off value.
+        In condensed matter physics, the iso-surface at an energy cut off equal to zero is called 
+        the Fermi surface. At zero temperature the Fermi surface
+        separates the occupied electron states from the unoccupied ones. Its characteristic shape 
+        is fundamental to understand the electronic properties
+        of crystalline materials.
+        <dl>
         <li>The left panel displays iso-surfaces colorized by the direction of the surface normal at each vertex.</li>
         <li>The middle panel displays iso-surfaces colorized by electron velocity vector at each vertex.</li>
-        <li>The right panel displays wireframes for the iso-surfaces where the different colors
-          represent different quanta (??? What do the different indices represent????)
+        <li>The right panel displays a wireframe of the iso-surface.
         </li>
       </dl>
     </p>
